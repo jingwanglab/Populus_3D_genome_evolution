@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+for i in Ppse Pwua Psze Plas Pyun Prot Pqio Pdav Pade Psim;
+do
+  cd /w/00/g/g00/hic/tad.analysis/changed_tad.sv/"$i";
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.tad.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.tad.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.tad.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.boundary.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.boundary.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.boundary.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.interior.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.interior.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.interior.bed ./;
+  ####### SV coverage in TADs
+  bedtools coverage -a "$i".high.con.tad.bed -b sv.bed -nonamecheck | awk '{print $7"\t""H-conserved""\t""tad"}' > "$i".high.con.tad.sv.coverage.csv;
+  bedtools coverage -a "$i".con.tad.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Conserved""\t""tad"}' > "$i".con.tad.sv.coverage.csv;
+  bedtools coverage -a "$i".spe.tad.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Diverged""\t""tad"}' > "$i".spe.tad.sv.coverage.csv;
+  cat "$i".high.con.tad.sv.coverage.csv "$i".con.tad.sv.coverage.csv "$i".spe.tad.sv.coverage.csv >  "$i".high.con.spe.tad.sv.coverage.csv;
+  ####### SV coverage at TAD boundaries
+  bedtools coverage -a "$i".high.con.boundary.bed -b sv.bed -nonamecheck | awk '{print $7"\t""H-conserved""\t""boundary"}' > "$i".high.con.boundary.sv.coverage.csv;
+  bedtools coverage -a "$i".con.boundary.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Conserved""\t""boundary"}' > "$i".con.boundary.sv.coverage.csv;
+  bedtools coverage -a "$i".spe.boundary.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Diverged""\t""boundary"}' > "$i".spe.boundary.sv.coverage.csv;
+  cat "$i".high.con.boundary.sv.coverage.csv "$i".con.boundary.sv.coverage.csv "$i".spe.boundary.sv.coverage.csv >  "$i".high.con.spe.boundary.sv.coverage.csv;
+  ####### SV coverage in TAD interior regions
+  bedtools coverage -a "$i".high.con.interior.bed -b sv.bed -nonamecheck | awk '{print $7"\t""H-conserved""\t""interior"}' > "$i".high.con.interior.sv.coverage.csv;
+  bedtools coverage -a "$i".con.interior.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Conserved""\t""interior"}' > "$i".con.interior.sv.coverage.csv;
+  bedtools coverage -a "$i".spe.interior.bed -b sv.bed -nonamecheck | awk '{print $7"\t""Diverged""\t""interior"}' > "$i".spe.interior.sv.coverage.csv;
+  cat "$i".high.con.interior.sv.coverage.csv "$i".con.interior.sv.coverage.csv "$i".spe.interior.sv.coverage.csv >  "$i".high.con.spe.interior.sv.coverage.csv;
+  ####### Combine all SV coverage data
+  cat "$i".high.con.spe.tad.sv.coverage.csv "$i".high.con.spe.boundary.sv.coverage.csv "$i".high.con.spe.interior.sv.coverage.csv > "$i".high.con.spe.tad.boundary.interior.sv.coverage.csv;
+done

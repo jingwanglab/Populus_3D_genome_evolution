@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+bedtools intersect -nonamecheck -a indel.merge.bed -b Pkor.hcon.con.tad.bed -wa -wb > Pkor.hcon.con.tad.indel.overlap;
+bedtools intersect -nonamecheck -a indel.merge.bed -b Pkor.spe.tad.bed -wa -wb > Pkor.spe.tad.indel.overlap;
+bedtools intersect -nonamecheck -a inv.merge.bed -b Pkor.hcon.con.tad.bed -wa -wb > Pkor.hcon.con.tad.inv.overlap;
+bedtools intersect -nonamecheck -a inv.merge.bed -b Pkor.spe.tad.bed -wa -wb > Pkor.spe.tad.inv.overlap;
+bedtools intersect -nonamecheck -a dup.merge.bed -b Pkor.hcon.con.tad.bed -wa -wb > Pkor.hcon.con.tad.dup.overlap;
+bedtools intersect -nonamecheck -a dup.merge.bed -b Pkor.spe.tad.bed -wa -wb > Pkor.spe.tad.dup.overlap;
+bedtools intersect -nonamecheck -a trans.merge.bed -b Pkor.hcon.con.tad.bed -wa -wb > Pkor.hcon.con.tad.trans.overlap;
+bedtools intersect -nonamecheck -a trans.merge.bed -b Pkor.spe.tad.bed -wa -wb > Pkor.spe.tad.trans.overlap;

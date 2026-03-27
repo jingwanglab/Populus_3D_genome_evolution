@@ -1,0 +1,55 @@
+#!/usr/bin/bash
+for i in Ppse Pwua Psze Plas Pyun Prot Pqio Pdav Pade Psim;
+do
+  cd /w/00/g/g00/hic/tad.analysis/changed_tad.sv_enrichment/;
+  mkdir "$i";cd "$i";
+  ##### Prepare data
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.sv/"$i"/sv.bed ./;
+  less sv.bed | awk '{print $1"\t"$2-1"\t"$2"\t"$4"\n"$1"\t"$3"\t"$3+1"\t"$4}' > sv.breakpoint.bed;
+  bedtools shuffle -i sv.breakpoint.bed -g /w/00/g/g00/hic/hicpro/"$i"/new_out/"$i".size -chrom > sv.breakpoint.random.bed;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".high.con.tad.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".high.con.taddown.50kb.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".high.con.tadup.50kb.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".con.tad.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".con.tadup.50kb.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".con.taddown.50kb.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".spe.tad.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".spe.tadup.50kb.20bin.bed ./;
+  ln -s /w/00/g/g00/hic/tad.analysis/changed_tad.methylation/"$i"/"$i".spe.taddown.50kb.20bin.bed ./;  
+  ############## Diverged TADs #############
+  ##### observed sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".spe.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".spe.tad.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".spe.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".spe.tadup.50kb.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".spe.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".spe.taddown.50kb.20bin.sv.breakpoint;
+  cat "$i".spe.tadup.50kb.20bin.sv.breakpoint "$i".spe.tad.20bin.sv.breakpoint  "$i".spe.taddown.50kb.20bin.sv.breakpoint | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".spe.uptaddown.50kb.20bin.sv.breakpoint.csv;
+  ##### random sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".spe.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".spe.tad.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".spe.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".spe.tadup.50kb.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".spe.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".spe.taddown.50kb.20bin.sv.breakpoint.random;
+  cat "$i".spe.tadup.50kb.20bin.sv.breakpoint.random "$i".spe.tad.20bin.sv.breakpoint.random  "$i".spe.taddown.50kb.20bin.sv.breakpoint.random | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".spe.uptaddown.50kb.20bin.sv.breakpoint.random.csv;
+  paste "$i".spe.uptaddown.50kb.20bin.sv.breakpoint.csv "$i".spe.uptaddown.50kb.20bin.sv.breakpoint.random.csv | awk '{print $1"\t"$6"\t"$1/$6"\t"$2"\t"$3"\t"$4"\t"$5}' > "$i".spe.uptaddown.50kb.20bin.sv.breakpoint.observed.random.csv
+  ############## Highly conserved TADs #############
+  ##### observed sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".high.con.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".high.con.tad.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".high.con.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".high.con.tadup.50kb.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".high.con.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".high.con.taddown.50kb.20bin.sv.breakpoint;
+  cat "$i".high.con.tadup.50kb.20bin.sv.breakpoint "$i".high.con.tad.20bin.sv.breakpoint  "$i".high.con.taddown.50kb.20bin.sv.breakpoint | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".high.con.uptaddown.50kb.20bin.sv.breakpoint.csv;
+  ##### random sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".high.con.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".high.con.tad.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".high.con.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".high.con.tadup.50kb.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".high.con.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".high.con.taddown.50kb.20bin.sv.breakpoint.random;
+  cat "$i".high.con.tadup.50kb.20bin.sv.breakpoint.random "$i".high.con.tad.20bin.sv.breakpoint.random  "$i".high.con.taddown.50kb.20bin.sv.breakpoint.random | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".high.con.uptaddown.50kb.20bin.sv.breakpoint.random.csv;
+  paste "$i".high.con.uptaddown.50kb.20bin.sv.breakpoint.csv "$i".high.con.uptaddown.50kb.20bin.sv.breakpoint.random.csv | awk '{print $1"\t"$6"\t"$1/$6"\t"$2"\t"$3"\t"$4"\t"$5}' > "$i".high.con.uptaddown.50kb.20bin.sv.breakpoint.observed.random.csv
+  ############## Conserved TADs #############
+  ##### observed sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".con.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".con.tad.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".con.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".con.tadup.50kb.20bin.sv.breakpoint;
+  bedtools intersect -nonamecheck -a sv.breakpoint.bed -b "$i".con.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".con.taddown.50kb.20bin.sv.breakpoint;
+  cat "$i".con.tadup.50kb.20bin.sv.breakpoint "$i".con.tad.20bin.sv.breakpoint  "$i".con.taddown.50kb.20bin.sv.breakpoint | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".con.uptaddown.50kb.20bin.sv.breakpoint.csv;
+  ##### random sv breakpoint
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".con.tad.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""tad"}}'| sort -k2,2n > "$i".con.tad.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".con.tadup.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""up"}}'| sort -k2,2n > "$i".con.tadup.50kb.20bin.sv.breakpoint.random;
+  bedtools intersect -nonamecheck -a sv.breakpoint.random.bed -b "$i".con.taddown.50kb.20bin.bed -wa -wb |awk '{print $4"\t"$8}' | awk '{a[$2]+=1}END{for(i in a){print a[i]"\t"i"\t""down"}}'| sort -k2,2n > "$i".con.taddown.50kb.20bin.sv.breakpoint.random;
+  cat "$i".con.tadup.50kb.20bin.sv.breakpoint.random "$i".con.tad.20bin.sv.breakpoint.random  "$i".con.taddown.50kb.20bin.sv.breakpoint.random | awk '{print $1"\t"$2"\t"$3"\t"NR"\t""'$i'"}' > "$i".con.uptaddown.50kb.20bin.sv.breakpoint.random.csv;
+  paste "$i".con.uptaddown.50kb.20bin.sv.breakpoint.csv "$i".con.uptaddown.50kb.20bin.sv.breakpoint.random.csv | awk '{print $1"\t"$6"\t"$1/$6"\t"$2"\t"$3"\t"$4"\t"$5}' > "$i".con.uptaddown.50kb.20bin.sv.breakpoint.observed.random.csv
+done

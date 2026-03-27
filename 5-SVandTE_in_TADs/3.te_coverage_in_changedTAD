@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+for i in Ppse Pwua Psze Plas Pyun Prot Pqio Pdav Pade Psim;
+do
+   cd /w/00/g/g00/hic/tad.analysis/changed_tad.te/;
+   mkdir "$i";cd "$i";
+   ln -s /w/00/g/g00/hic/compartment/gene.te.class/"$i"/TE.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.tad.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.tad.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.tad.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.boundary.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.boundary.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.boundary.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".high.con.interior.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".con.interior.bed ./;
+   ln -s /w/00/g/g00/hic/tad.analysis/changed_tad/"$i"/"$i".spe.interior.bed ./;
+   ######### TE coverage in TADs
+   bedtools coverage -a "$i".high.con.tad.bed -b TE.bed -nonamecheck | awk '{print $7"\t""H-conserved"}' > "$i".high.con.tad.te.coverage.csv;
+   bedtools coverage -a "$i".con.tad.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Conserved"}' > "$i".con.tad.te.coverage.csv;
+   bedtools coverage -a "$i".spe.tad.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Diverged"}' > "$i".spe.tad.te.coverage.csv;
+   cat "$i".high.con.tad.te.coverage.csv "$i".con.tad.te.coverage.csv "$i".spe.tad.te.coverage.csv >  "$i".high.con.spe.tad.te.coverage.csv;
+
+   ######### TE coverage at TAD boundaries
+   bedtools coverage -a "$i".high.con.boundary.bed -b TE.bed -nonamecheck | awk '{print $7"\t""H-conserved""\t""boundary"}' > "$i".high.con.boundary.te.coverage.csv;
+   bedtools coverage -a "$i".con.boundary.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Conserved""\t""boundary"}' > "$i".con.boundary.te.coverage.csv;
+   bedtools coverage -a "$i".spe.boundary.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Diverged""\t""boundary"}' > "$i".spe.boundary.te.coverage.csv;
+   cat "$i".high.con.boundary.te.coverage.csv "$i".con.boundary.te.coverage.csv "$i".spe.boundary.te.coverage.csv >  "$i".high.con.spe.boundary.te.coverage.csv;
+
+   ######### TE coverage in TAD interior regions
+   bedtools coverage -a "$i".high.con.interior.bed -b TE.bed -nonamecheck | awk '{print $7"\t""H-conserved""\t""interior"}' > "$i".high.con.interior.te.coverage.csv;
+   bedtools coverage -a "$i".con.interior.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Conserved""\t""interior"}' > "$i".con.interior.te.coverage.csv;
+   bedtools coverage -a "$i".spe.interior.bed -b TE.bed -nonamecheck | awk '{print $7"\t""Diverged""\t""interior"}' > "$i".spe.interior.te.coverage.csv;
+   cat "$i".high.con.interior.te.coverage.csv "$i".con.interior.te.coverage.csv "$i".spe.interior.te.coverage.csv >  "$i".high.con.spe.interior.te.coverage.csv;
+   ######### Combine all TE coverage data
+   cat "$i".high.con.spe.tad.te.coverage.csv "$i".high.con.spe.boundary.te.coverage.csv "$i".high.con.spe.interior.te.coverage.csv > "$i".high.con.spe.tad.boundary.interior.te.coverage.csv;
+done
