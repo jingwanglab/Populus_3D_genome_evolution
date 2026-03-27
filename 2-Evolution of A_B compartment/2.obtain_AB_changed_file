@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+for i in Ppse Pwua Psze Plas Pyun Prot Pqio Pdav Pade Psim;
+do
+   cd /w/00/g/g00/hic/compartment/ab.change.homologous.bin/;
+   cd Pkor."$i";
+   ## Obtain the corresponding .bed file for AB compartment transition
+   awk '{if($4=="A" && $8=="B" && $1==$5) print $1"\t"$2"\t"$3"\t""Pkor""\t""A-B"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > A2B_APkor.homologous.bin;
+   awk '{if($4=="A" && $8=="B" && $1==$5) print $5"\t"$6"\t"$7"\t""'$i'""\t""A-B"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > A2B_B"$i".homologous.bin;
+   awk '{if($4=="B" && $8=="A" && $1==$5) print $1"\t"$2"\t"$3"\t""Pkor""\t""B-A"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > B2A_BPkor.homologous.bin;
+   awk '{if($4=="B" && $8=="A" && $1==$5) print $5"\t"$6"\t"$7"\t""'$i'""\t""B-A"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > B2A_A"$i".homologous.bin;
+   awk '{if($4=="A" && $8=="A" && $1==$5) print $1"\t"$2"\t"$3"\t""Pkor""\t""A-A"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > A2A_APkor.homologous.bin;
+   awk '{if($4=="A" && $8=="A" && $1==$5) print $5"\t"$6"\t"$7"\t""'$i'""\t""A-A"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > A2A_A"$i".homologous.bin;
+   awk '{if($4=="B" && $8=="B" && $1==$5) print $1"\t"$2"\t"$3"\t""Pkor""\t""B-B"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > B2B_BPkor.homologous.bin;
+   awk '{if($4=="B" && $8=="B" && $1==$5) print $5"\t"$6"\t"$7"\t""'$i'""\t""B-B"}' Pkor."$i".homologous.bin.AB.csv|sort -k1,1V -k2,2n -k3,3n > B2B_B"$i".homologous.bin;
+   bedtools merge -i A2B_APkor.homologous.bin |awk '{print $0"\t""Pkor""\t""A-B"}' > A2B_APkor.homologous.bin.merge;
+   bedtools merge -i B2A_BPkor.homologous.bin |awk '{print $0"\t""Pkor""\t""B-A"}' > B2A_BPkor.homologous.bin.merge;
+   bedtools merge -i A2A_APkor.homologous.bin |awk '{print $0"\t""Pkor""\t""A-A"}' > A2A_APkor.homologous.bin.merge;
+   bedtools merge -i B2B_BPkor.homologous.bin |awk '{print $0"\t""Pkor""\t""B-B"}' > B2B_BPkor.homologous.bin.merge;
+   bedtools merge -i A2B_B"$i".homologous.bin |awk '{print $0"\t""'$i'""\t""A-B"}' > A2B_B"$i".homologous.bin.merge;
+   bedtools merge -i B2A_A"$i".homologous.bin |awk '{print $0"\t""'$i'""\t""B-A"}' > B2A_A"$i".homologous.bin.merge;
+   bedtools merge -i A2A_A"$i".homologous.bin |awk '{print $0"\t""'$i'""\t""A-A"}' > A2A_A"$i".homologous.bin.merge;
+   bedtools merge -i B2B_B"$i".homologous.bin |awk '{print $0"\t""'$i'""\t""B-B"}' > B2B_B"$i".homologous.bin.merge;
+done
